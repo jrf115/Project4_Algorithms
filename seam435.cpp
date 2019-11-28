@@ -14,10 +14,10 @@ using std::ifstream;
 using std::ofstream;
 using std::string;
 
-int main(int charc, char argv[])
+int main(int argc, char *argv[])
 {
-	if (argc < 3)
-		cout << "Error: Running program format must be: ./seam435 something something" << endl;
+	if (argc < 4)
+		cout << "Error: Running program format must be: \"./seam435 imageFile.pgm #verticalSeams #horizontalSeams\"" << endl;
 	else {
 
 	}
