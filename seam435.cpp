@@ -83,5 +83,21 @@ int main(int argc, char *argv[])
 		// We can see some of the int values, that are above 127, get stored as 2's compliments. 
 		// Take this into account when we have to use the non 2's compliment forms of these numbers.
 		printArray(rows, columns, pgm_Arr);
+
+		// Testing outputfile...
+		outputFile.open("testingoutput.pgm");
+		outputFile << "P2\n# Created by IrfanView\n" << columns << " " << rows << "\n" << maxGreyVal << "\n";
+		for (int r(0); r < rows; r++) {
+			for (int c(0); c < columns; c++) {
+				if (int(pgm_Arr[r][c]) <= 0)
+					outputFile << 256 + int(pgm_Arr[r][c]);
+				else
+					outputFile << int(pgm_Arr[r][c]);
+				if (c != columns - 1)
+					outputFile << " ";
+			}
+			if (r != rows - 1)
+				outputFile << "\n";
+		}
 	}
 }
