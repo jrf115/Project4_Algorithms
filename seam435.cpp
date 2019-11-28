@@ -19,10 +19,37 @@ using std::getline;
 char** build_Energy_Array(int columns, int rows, char** pgm_arr);
 void carve_VerSeam(char** pgm_arr, int seams);
 void carve_HorSeam(char** pgm_arr, int seams);
-char rotateArray90(int columns, int rows, char** pgm_arr);
+void rotateArray90(int columns, int rows, char** pgm_arr);
 void rotateArray270(int columns, int rows, char** pgm_arr);
 void printArray(int rows, int columns, char** arr);
 
+void rotateArray90(int columns, int rows, char** pgm_arr)
+{
+	int rotated_c(0), rotated_r(0);
+	char** rotated_arr = new char*[columns];
+	for (int c(0); c < columns; c++)
+		for (int r(0); r < rows; r++)
+			rotated_arr[r] = new char[rows];
+
+	for (int c(columns - 1); c <= 0; rows--) {
+		for (int r(rows - 1); r <= 0; columns--) {
+			if (rotated_c == rows)
+				rotated_c = 0;
+			rotated_arr[rotated_r][rotated_c] = pgm_arr[r][c];
+			rotated_c++;
+		}
+		delete[] pgm_arr[c];
+		rotated_r++;
+	}
+	delete[] pgm_arr;
+	pgm_arr = rotated_arr;
+}
+
+void rotateArray270(int columns, int rows, char** pgm_arr)
+{
+	for (int i(0); i < 3; i++)
+		rotateArray90(columns, rows, pgm_arr);
+}
 
 /* Debugging Function */
 void printArray(int rows, int columns, char** arr)
@@ -85,7 +112,7 @@ int main(int argc, char *argv[])
 		// We can see some of the int values, that are above 127, get stored as 2's compliments. 
 		// Take this into account when we have to use the non 2's compliment forms of these numbers.
 		printArray(rows, columns, pgm_Arr);
-
+		rotateArray270
 		// Testing outputfile...
 		outputFile.open("testingoutput.pgm");
 		outputFile << "P2\n# Created by IrfanView\n" << columns << " " << rows << "\n" << maxGreyVal << "\n";
