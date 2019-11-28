@@ -37,26 +37,6 @@ void printArray(int rows, int columns, char** arr)
 
 int main(int argc, char *argv[])
 {
-	/*
-	{
-		for (int i(0); i < 128; i++)
-		{
-			cout << char(i) << " ";
-		}
-		cout << endl;
-		char** doublearray = new char*[25];
-		for (int i(0); i < 25; i++)
-		{
-			doublearray[i] = new char[15];
-			for (int k(0); k < 15; k++)
-			{
-				doublearray[i][k] = (k + 100 + i);
-				cout << doublearray[i][k] << " ";
-			}
-			cout << endl;
-		}
-	}
-	*/
 	if (argc < 4)
 		cout << "Error: Running program format must be: \"./seam435 imageFile.pgm #verticalSeams #horizontalSeams\"" << endl;
 
