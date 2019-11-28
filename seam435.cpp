@@ -16,13 +16,15 @@ using std::ofstream;
 using std::string;
 using std::getline;
 
-char** build_Energy_Array(int rows, int columns, char** pgm_arr);
-void seamVertical(char** picArray, int seams);
-void rotateArray90(char** picArray);
-void rotateArray270(char** picArray);
+char** build_Energy_Array(int columns, int rows, char** pgm_arr);
+void carve_VerSeam(char** pgm_arr, int seams);
+void carve_HorSeam(char** pgm_arr, int seams);
+char rotateArray90(int columns, int rows, char** pgm_arr);
+void rotateArray270(int columns, int rows, char** pgm_arr);
 void printArray(int rows, int columns, char** arr);
 
 
+/* Debugging Function */
 void printArray(int rows, int columns, char** arr)
 {
 	cout << endl << "Reading from 2dim_char array: " << endl;
