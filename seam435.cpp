@@ -16,47 +16,43 @@ using std::ofstream;
 using std::string;
 using std::getline;
 
-char** build_Energy_Array(int columns, int rows, char** pgm_arr);
-void carve_VerSeam(char** pgm_arr, int seams);
-void carve_HorSeam(char** pgm_arr, int seams);
-void rotateArray90(int& columns, int& rows, char** & pgm_arr);
-void rotateArray270(int& columns, int& rows, char** & pgm_arr);
-void printArray(int columns, int rows, char** arr);
+char* build_Energy_Array(int columns, int rows, char pgm_arr[]);
+void carve_VerSeam(char* pgm_arr, int seams);
+void carve_HorSeam(char* pgm_arr, int seams);
+void rotateArray90(int& columns, int& rows, char* pgm_arr);
+void rotateArray270(int& columns, int& rows, char* & pgm_arr);
+void printArray(int columns, int rows, char arr[]);
 
-void rotateArray90(int& columns, int& rows, char** & pgm_arr)
+void rotateArray90(int& columns, int& rows, char* pgm_arr)
 {
 	int rotated_c(0), rotated_r(0);
-	char** rotated_arr = new char*[columns];
-	for (int r(0); r < rows; r++)
-		for (int c(0); c < columns; c++)
-			rotated_arr[r] = new char[rows];
+	char* copy = new char[columns * rows];
+	for (int i(0); i < columns * rows; i++)
+		copy[i] = pgm_arr[i];
+
+	cout << "Made Copy" << endl;
+	printArray(columns, rows, copy);
 
 	for (int c(0); c < columns; c++) {
 		for (int r(rows - 1); r >= 0; r--) {	
-			rotated_arr[rotated_r][rotated_c] = pgm_arr[r][c];
+			pgm_arr[rotated_c + rotated_r * rows] = copy[c + r * columns];
+			cout << "copied " << c << " + " << r << " * " << columns << " == " << c + r * columns << " _____TO_____ " << rotated_c << " + " << rotated_r << " * " << rows << " == " << rotated_c + rotated_r * rows << endl;
 			rotated_c++;
 		}
 		rotated_r++;
 		rotated_c = 0;
 	}
 	
-	// Delete old array
-	for (int r(0); r < rows; r++)
-		for (int c(0); c < columns; c++)
-			delete[] pgm_arr[r];
-	delete[] pgm_arr;
-
-	pgm_arr = (rotated_arr);
+	// Delete old array and switch columns/rows
+	delete copy;
 	int temp(columns);
 	columns = rows;
 	rows = temp;
 	cout << "pgm_arr 90_rotated to: " << endl;
 	printArray(columns, rows, pgm_arr);
-	printArray(columns, rows, rotated_arr);
 }
 
-void rotateArray270(int& columns, int& rows, char** & pgm_arr)
-{
+void rotateArray270(int& columns, int& rows, char* pgm_arr) {
 	for (int i(0); i < 3; i++)
 		rotateArray90(columns, rows, pgm_arr);
 	cout << "pgm_arr 270_rotated to: " << endl;
@@ -65,12 +61,12 @@ void rotateArray270(int& columns, int& rows, char** & pgm_arr)
 }
 
 /* Debugging Function */
-void printArray(int columns, int rows, char** arr)
+void printArray(int columns, int rows, char arr[])
 {
 	cout << endl << "Reading from 2dim_char array: " << endl;
 	for (int r(0); r < rows; r++) {
 		for (int c(0); c < columns; c++)
-			cout << int(arr[r][c]) << " ";
+			cout << int(arr[c + r * columns]) << " ";
 		cout << endl;
 	}
 }
@@ -136,12 +132,10 @@ int main(int argc, char *argv[])
 		int ro = 3;
 		int co = 2;
 		int increment = 1;
-		char** testArr = new char*[ro];
-		for (int t(0); t < ro; t++)
-			testArr[t] = new char[co];
+		char testArr[ro * co];
 		for (int t(0); t < ro; t++)
 			for (int tt(0); tt < co; tt++)
-				testArr[t][tt] = increment++;
+				testArr[co * t + tt] = increment++;
 		printArray(co, ro, testArr);
 		cout << "Column " << co << " Rows " << ro << endl << endl;
 		
