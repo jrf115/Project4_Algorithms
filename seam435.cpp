@@ -30,13 +30,10 @@ void rotateArray90(int& columns, int& rows, char* pgm_arr)
 	for (int i(0); i < columns * rows; i++)
 		copy[i] = pgm_arr[i];
 
-	cout << "Made Copy" << endl;
-	printArray(columns, rows, copy);
-
 	for (int c(0); c < columns; c++) {
 		for (int r(rows - 1); r >= 0; r--) {	
 			pgm_arr[rotated_c + rotated_r * rows] = copy[c + r * columns];
-			cout << "copied " << c << " + " << r << " * " << columns << " == " << c + r * columns << " _____TO_____ " << rotated_c << " + " << rotated_r << " * " << rows << " == " << rotated_c + rotated_r * rows << endl;
+			//cout << "copied " << c << " + " << r << " * " << columns << " == " << c + r * columns << " _____TO_____ " << rotated_c << " + " << rotated_r << " * " << rows << " == " << rotated_c + rotated_r * rows << endl;
 			rotated_c++;
 		}
 		rotated_r++;
@@ -64,6 +61,7 @@ void rotateArray270(int& columns, int& rows, char* pgm_arr) {
 void printArray(int columns, int rows, char arr[])
 {
 	cout << endl << "Reading from 2dim_char array: " << endl;
+	cout << "Columns: " << columns << " and rows: " << rows << endl;
 	for (int r(0); r < rows; r++) {
 		for (int c(0); c < columns; c++)
 			cout << int(arr[c + r * columns]) << " ";
@@ -99,10 +97,8 @@ int main(int argc, char *argv[])
 		/* Initialize and build pgm_array */
 		/* Chars are less expensive than ints for storing numbers 0-255 */
 		/* Pay attention to how chars may store some numbers, though. */
-		char** pgm_Arr = new char*[rows];
+		char pgm_Arr[columns * rows];
 		int numRead;
-		for (int i(0); i < rows; i++)
-			pgm_Arr[i] = new char[columns];
 		cout << "Reading from input to int var: " << endl;
 		for (int r(0); r < rows; r++) {
 			for (int c(0); c < columns; c++) {
@@ -112,11 +108,11 @@ int main(int argc, char *argv[])
 					return 0;
 				}
 				cout << numRead << " ";
-				pgm_Arr[r][c] = numRead;
+				pgm_Arr[columns * r + c] = numRead;
 			}
 			cout << endl;
 		}
-		/*
+		
 		// We can see some of the int values, that are above 127, get stored as 2's compliments. 
 		// Take this into account when we have to use the non 2's compliment forms of these numbers.
 		printArray(columns, rows, pgm_Arr);
@@ -126,43 +122,16 @@ int main(int argc, char *argv[])
 		rotateArray270(columns, rows, pgm_Arr);
 		cout << "RotatedArray again" << endl;
 		printArray(columns, rows, pgm_Arr);
-		*/
-
-		cout << "\n\nTesting 1 2 3 4 5 6 Array" << endl;
-		int ro = 3;
-		int co = 2;
-		int increment = 1;
-		char testArr[ro * co];
-		for (int t(0); t < ro; t++)
-			for (int tt(0); tt < co; tt++)
-				testArr[co * t + tt] = increment++;
-		printArray(co, ro, testArr);
-		cout << "Column " << co << " Rows " << ro << endl << endl;
-		
-		cout << "Rotating 90" << endl;
-		rotateArray90(co, ro, testArr);
-		printArray(co, ro, testArr);
-		cout << "Column " << co << " Rows " << ro << endl << endl;
-		
-		cout << "Rotating 90" << endl;
-		rotateArray90(co, ro, testArr);
-		printArray(co, ro, testArr);
-		cout << "Column " << co << " Rows " << ro << endl << endl;
-
-		cout << "Rotating 270" << endl;
-		rotateArray270(co, ro, testArr);
-		printArray(co, ro, testArr);
-		cout << "Column " << co << " Rows " << ro << endl << endl;
 
 		// Testing outputfile...
 		outputFile.open("testingoutput.pgm");
 		outputFile << "P2\n# Created by IrfanView\n" << columns << " " << rows << "\n" << maxGreyVal << "\n";
 		for (int r(0); r < rows; r++) {
 			for (int c(0); c < columns; c++) {
-				if (int(pgm_Arr[r][c]) <= 0)
-					outputFile << 256 + int(pgm_Arr[r][c]);
+				if (int(pgm_Arr[columns * r + c]) <= 0)
+					outputFile << 256 + int(pgm_Arr[columns * r + c]);
 				else
-					outputFile << int(pgm_Arr[r][c]);
+					outputFile << int(pgm_Arr[columns * r + c]);
 				if (c != columns - 1)
 					outputFile << " ";
 			}
