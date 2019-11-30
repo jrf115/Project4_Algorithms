@@ -21,7 +21,7 @@ void carve_VerSeam(char* pgm_arr, int seams);
 void carve_HorSeam(char* pgm_arr, int seams);
 void rotateArray90(int& columns, int& rows, char* pgm_arr);
 void rotateArray270(int& columns, int& rows, char* & pgm_arr);
-void printArray(int columns, int rows, char arr[]);
+void printRawArray(int columns, int rows, char arr[]);
 
 void rotateArray90(int& columns, int& rows, char* pgm_arr)
 {
@@ -45,20 +45,25 @@ void rotateArray90(int& columns, int& rows, char* pgm_arr)
 	int temp(columns);
 	columns = rows;
 	rows = temp;
+	/*
 	cout << "pgm_arr 90_rotated to: " << endl;
-	printArray(columns, rows, pgm_arr);
+	printRawArray(columns, rows, pgm_arr);
+	*/
 }
 
 void rotateArray270(int& columns, int& rows, char* pgm_arr) {
 	for (int i(0); i < 3; i++)
 		rotateArray90(columns, rows, pgm_arr);
+	/*
 	cout << "pgm_arr 270_rotated to: " << endl;
-	printArray(columns, rows, pgm_arr);
+	printRawArray(columns, rows, pgm_arr);
 	cout << endl;
+	*/
 }
 
 /* Debugging Function */
-void printArray(int columns, int rows, char arr[])
+/* Prints the stored char value as an int. May print out 2's compliments of numbers */
+void printRawArray(int columns, int rows, char arr[])
 {
 	cout << endl << "Reading from 2dim_char array: " << endl;
 	cout << "Columns: " << columns << " and rows: " << rows << endl;
@@ -112,16 +117,15 @@ int main(int argc, char *argv[])
 			}
 			cout << endl;
 		}
-		
+		/*////////////////////////////////////////////////////////////////////////////////////////////
 		// We can see some of the int values, that are above 127, get stored as 2's compliments. 
 		// Take this into account when we have to use the non 2's compliment forms of these numbers.
-		printArray(columns, rows, pgm_Arr);
+		
+		printRawArray(columns, rows, pgm_Arr);
 		rotateArray90(columns, rows, pgm_Arr);
 		cout << "RotatedArray" << endl;
-		printArray(columns, rows, pgm_Arr);
-		rotateArray270(columns, rows, pgm_Arr);
-		cout << "RotatedArray again" << endl;
-		printArray(columns, rows, pgm_Arr);
+		printRawArray(columns, rows, pgm_Arr);
+		/////////////////////////////////////////////////////////////////////////////////////////////*/
 
 		// Testing outputfile...
 		outputFile.open("testingoutput.pgm");
@@ -129,7 +133,7 @@ int main(int argc, char *argv[])
 		for (int r(0); r < rows; r++) {
 			for (int c(0); c < columns; c++) {
 				if (int(pgm_Arr[columns * r + c]) <= 0)
-					outputFile << 256 + int(pgm_Arr[columns * r + c]);
+					outputFile << 256 + int(pgm_Arr[columns * r + c]); // The current value is a 2's compliment.
 				else
 					outputFile << int(pgm_Arr[columns * r + c]);
 				if (c != columns - 1)
