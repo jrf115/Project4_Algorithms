@@ -23,6 +23,7 @@ void rotateArray90(int& columns, int& rows, char* pgm_arr);
 void rotateArray270(int& columns, int& rows, char* & pgm_arr);
 void printRawArray(int columns, int rows, char arr[]);
 
+
 void rotateArray90(int& columns, int& rows, char* pgm_arr)
 {
 	int rotated_c(0), rotated_r(0);
@@ -118,7 +119,7 @@ int main(int argc, char *argv[])
 			cout << endl;
 		}
 		/*////////////////////////////////////////////////////////////////////////////////////////////
-		// We can see some of the int values, that are above 127, get stored as 2's compliments. 
+		// We can see some of the int values, that are above 127, get stored into the char array as 2's compliments. 
 		// Take this into account when we have to use the non 2's compliment forms of these numbers.
 		
 		printRawArray(columns, rows, pgm_Arr);
