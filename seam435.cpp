@@ -16,61 +16,61 @@ using std::ofstream;
 using std::string;
 using std::getline;
 
-char** build_Energy_Array(int columns, int rows, char** pgm_arr);
-void carve_VerSeam(char** pgm_arr, int seams);
-void carve_HorSeam(char** pgm_arr, int seams);
-void rotateArray90(int& columns, int& rows, char** & pgm_arr);
-void rotateArray270(int& columns, int& rows, char** & pgm_arr);
-void printArray(int columns, int rows, char** arr);
+char* build_Energy_Array(int columns, int rows, char pgm_arr[]);
+void carve_VerSeam(char* pgm_arr, int seams);
+void carve_HorSeam(char* pgm_arr, int seams);
+void rotateArray90(int& columns, int& rows, char* pgm_arr);
+void rotateArray270(int& columns, int& rows, char* & pgm_arr);
+void printRawArray(int columns, int rows, char arr[]);
 
-void rotateArray90(int& columns, int& rows, char** & pgm_arr)
+
+void rotateArray90(int& columns, int& rows, char* pgm_arr)
 {
 	int rotated_c(0), rotated_r(0);
-	char** rotated_arr = new char*[columns];
-	for (int r(0); r < rows; r++)
-		for (int c(0); c < columns; c++)
-			rotated_arr[r] = new char[rows];
+	char* copy = new char[columns * rows];
+	for (int i(0); i < columns * rows; i++)
+		copy[i] = pgm_arr[i];
 
 	for (int c(0); c < columns; c++) {
 		for (int r(rows - 1); r >= 0; r--) {	
-			rotated_arr[rotated_r][rotated_c] = pgm_arr[r][c];
+			pgm_arr[rotated_c + rotated_r * rows] = copy[c + r * columns];
+			//cout << "copied " << c << " + " << r << " * " << columns << " == " << c + r * columns << " _____TO_____ " << rotated_c << " + " << rotated_r << " * " << rows << " == " << rotated_c + rotated_r * rows << endl;
 			rotated_c++;
 		}
 		rotated_r++;
 		rotated_c = 0;
 	}
 	
-	// Delete old array
-	for (int r(0); r < rows; r++)
-		for (int c(0); c < columns; c++)
-			delete[] pgm_arr[r];
-	delete[] pgm_arr;
-
-	pgm_arr = (rotated_arr);
+	// Delete old array and switch columns/rows
+	delete copy;
 	int temp(columns);
 	columns = rows;
 	rows = temp;
+	/*
 	cout << "pgm_arr 90_rotated to: " << endl;
-	printArray(columns, rows, pgm_arr);
-	printArray(columns, rows, rotated_arr);
+	printRawArray(columns, rows, pgm_arr);
+	*/
 }
 
-void rotateArray270(int& columns, int& rows, char** & pgm_arr)
-{
+void rotateArray270(int& columns, int& rows, char* pgm_arr) {
 	for (int i(0); i < 3; i++)
 		rotateArray90(columns, rows, pgm_arr);
+	/*
 	cout << "pgm_arr 270_rotated to: " << endl;
-	printArray(columns, rows, pgm_arr);
+	printRawArray(columns, rows, pgm_arr);
 	cout << endl;
+	*/
 }
 
 /* Debugging Function */
-void printArray(int columns, int rows, char** arr)
+/* Prints the stored char value as an int. May print out 2's compliments of numbers */
+void printRawArray(int columns, int rows, char arr[])
 {
 	cout << endl << "Reading from 2dim_char array: " << endl;
+	cout << "Columns: " << columns << " and rows: " << rows << endl;
 	for (int r(0); r < rows; r++) {
 		for (int c(0); c < columns; c++)
-			cout << int(arr[r][c]) << " ";
+			cout << int(arr[c + r * columns]) << " ";
 		cout << endl;
 	}
 }
@@ -103,10 +103,8 @@ int main(int argc, char *argv[])
 		/* Initialize and build pgm_array */
 		/* Chars are less expensive than ints for storing numbers 0-255 */
 		/* Pay attention to how chars may store some numbers, though. */
-		char** pgm_Arr = new char*[rows];
+		char pgm_Arr[columns * rows];
 		int numRead;
-		for (int i(0); i < rows; i++)
-			pgm_Arr[i] = new char[columns];
 		cout << "Reading from input to int var: " << endl;
 		for (int r(0); r < rows; r++) {
 			for (int c(0); c < columns; c++) {
@@ -116,59 +114,29 @@ int main(int argc, char *argv[])
 					return 0;
 				}
 				cout << numRead << " ";
-				pgm_Arr[r][c] = numRead;
+				pgm_Arr[columns * r + c] = numRead;
 			}
 			cout << endl;
 		}
-		/*
-		// We can see some of the int values, that are above 127, get stored as 2's compliments. 
+		/*////////////////////////////////////////////////////////////////////////////////////////////
+		// We can see some of the int values, that are above 127, get stored into the char array as 2's compliments. 
 		// Take this into account when we have to use the non 2's compliment forms of these numbers.
-		printArray(columns, rows, pgm_Arr);
+		
+		printRawArray(columns, rows, pgm_Arr);
 		rotateArray90(columns, rows, pgm_Arr);
 		cout << "RotatedArray" << endl;
-		printArray(columns, rows, pgm_Arr);
-		rotateArray270(columns, rows, pgm_Arr);
-		cout << "RotatedArray again" << endl;
-		printArray(columns, rows, pgm_Arr);
-		*/
-
-		cout << "\n\nTesting 1 2 3 4 5 6 Array" << endl;
-		int ro = 3;
-		int co = 2;
-		int increment = 1;
-		char** testArr = new char*[ro];
-		for (int t(0); t < ro; t++)
-			testArr[t] = new char[co];
-		for (int t(0); t < ro; t++)
-			for (int tt(0); tt < co; tt++)
-				testArr[t][tt] = increment++;
-		printArray(co, ro, testArr);
-		cout << "Column " << co << " Rows " << ro << endl << endl;
-		
-		cout << "Rotating 90" << endl;
-		rotateArray90(co, ro, testArr);
-		printArray(co, ro, testArr);
-		cout << "Column " << co << " Rows " << ro << endl << endl;
-		
-		cout << "Rotating 90" << endl;
-		rotateArray90(co, ro, testArr);
-		printArray(co, ro, testArr);
-		cout << "Column " << co << " Rows " << ro << endl << endl;
-
-		cout << "Rotating 270" << endl;
-		rotateArray270(co, ro, testArr);
-		printArray(co, ro, testArr);
-		cout << "Column " << co << " Rows " << ro << endl << endl;
+		printRawArray(columns, rows, pgm_Arr);
+		/////////////////////////////////////////////////////////////////////////////////////////////*/
 
 		// Testing outputfile...
 		outputFile.open("testingoutput.pgm");
 		outputFile << "P2\n# Created by IrfanView\n" << columns << " " << rows << "\n" << maxGreyVal << "\n";
 		for (int r(0); r < rows; r++) {
 			for (int c(0); c < columns; c++) {
-				if (int(pgm_Arr[r][c]) <= 0)
-					outputFile << 256 + int(pgm_Arr[r][c]);
+				if (int(pgm_Arr[columns * r + c]) <= 0)
+					outputFile << 256 + int(pgm_Arr[columns * r + c]); // The current value is a 2's compliment.
 				else
-					outputFile << int(pgm_Arr[r][c]);
+					outputFile << int(pgm_Arr[columns * r + c]);
 				if (c != columns - 1)
 					outputFile << " ";
 			}
