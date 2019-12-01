@@ -40,30 +40,24 @@ int* build_Energy_Array(int columns, int rows, char pgm_arr[])
 	for (int p_row(0); p_row < rows; p_row++) {
 		for (int p_column(0); p_column < columns; p_column++) {
 			// Checking if v(i - 1, j) lies outside of the visual matrix space or not
-			cout << p_column - 1 << endl;
 			if (p_column - 1 >= 0)
 				energy_value += abs(char2PosInt(pgm_arr[p_column + p_row * columns]) - char2PosInt(pgm_arr[p_column - 1 + p_row * columns]));
 			// Check if v(i + 1, j) is outside of the visual matrix space or not
-			cout << p_column + 1 << endl;
 			if (p_column + 1 < columns)
 				energy_value += abs(char2PosInt(pgm_arr[p_column + p_row * columns]) - char2PosInt(pgm_arr[p_column + 1 + p_row * columns]));
 			// Check if v(i, j - 1) is outside of the visual matrix space or not
-			cout << p_row - 1 << endl;
 			if (p_row - 1 >= 0)
 				energy_value += abs(char2PosInt(pgm_arr[p_column + p_row * columns]) - char2PosInt(pgm_arr[p_column + (p_row - 1) * columns]));
 			// Check if v(i, j + 1) is outside of the visual matrix space or not
-			cout << p_row + 1 << endl;
 			if (p_row + 1 < rows)
 				energy_value += abs(char2PosInt(pgm_arr[p_column + p_row * columns]) - char2PosInt(pgm_arr[p_column + (p_row + 1) * columns]));
-			cout << "energy_value: " << (energy_value) << endl;
-			cout << endl;
-
 			energy[p_column + p_row * columns] = energy_value;
 			energy_value = 0;
 		}
 	}
 	cout << "Energy Array Produced: \n";
 	print_Energy_Array(columns, rows, energy);
+	cout << endl;
 	return energy;
 }
 
