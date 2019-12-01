@@ -17,15 +17,29 @@ using std::ofstream;
 using std::string;
 using std::getline;
 
+
+void carve_VerSeam(int& columns, int& rows, char* pgm_arr, int* energy, int seams);
+void carve_HorSeam(int& columns, int& rows, char* pgm_arr, int* energy, int seams);
 int* build_Energy_Array(int columns, int rows, char pgm_arr[]);
-void carve_VerSeam(char* pgm_arr, int seams);
-void carve_HorSeam(char* pgm_arr, int seams);
 void rotateArray90(int& columns, int& rows, char* pgm_arr);
-void rotateArray270(int& columns, int& rows, char* & pgm_arr);
+void rotateArray270(int& columns, int& rows, char* pgm_arr);
 void printRawArray(int columns, int rows, char arr[]);
 void printArray(int columns, int rows, char arr[]);
 void print_Energy_Array(int columns, int rows, int energy[]);
 int char2PosInt(char c);
+
+
+void carve_VerSeam(int& columns, int& rows, char* pgm_arr, int* energy, int seams)
+{
+
+}
+
+void carve_HorSeam(int& columns, int& rows, char* pgm_arr, int* energy, int seams)
+{
+	rotateArray90(columns, rows, pgm_arr);
+	carve_VerSeam(columns, rows, pgm_arr, energy, seams);
+	rotateArray270(columns, rows, pgm_arr);
+}
 
 /***
 Energy for a specifc pixel can be found using:
@@ -142,6 +156,7 @@ int char2PosInt(char c)
 	else
 		return int(c);
 }
+
 
 int main(int argc, char *argv[])
 {
