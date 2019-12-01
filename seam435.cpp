@@ -24,6 +24,15 @@ void rotateArray270(int& columns, int& rows, char* & pgm_arr);
 void printRawArray(int columns, int rows, char arr[]);
 
 
+char* build_Energy_Array(int columns, int rows, char pgm_arr[])
+{
+	char* energy = new char[columns * rows];
+	for (int p_row(0); p_row < rows; p_row++)
+	{
+
+	}
+}
+
 void rotateArray90(int& columns, int& rows, char* pgm_arr)
 {
 	int rotated_c(0), rotated_r(0);
