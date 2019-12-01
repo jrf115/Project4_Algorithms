@@ -17,13 +17,14 @@ using std::ofstream;
 using std::string;
 using std::getline;
 
-char* build_Energy_Array(int columns, int rows, char pgm_arr[]);
+int* build_Energy_Array(int columns, int rows, char pgm_arr[]);
 void carve_VerSeam(char* pgm_arr, int seams);
 void carve_HorSeam(char* pgm_arr, int seams);
 void rotateArray90(int& columns, int& rows, char* pgm_arr);
 void rotateArray270(int& columns, int& rows, char* & pgm_arr);
 void printRawArray(int columns, int rows, char arr[]);
 void printArray(int columns, int rows, char arr[]);
+void print_Energy_Array(int columns, int rows, int energy[]);
 int char2PosInt(char c);
 
 /***
@@ -32,9 +33,9 @@ Energy for a specifc pixel can be found using:
 Where:
 	v(i, j) = pixel value at(i, j)
 */
-char* build_Energy_Array(int columns, int rows, char pgm_arr[])
+int* build_Energy_Array(int columns, int rows, char pgm_arr[])
 {
-	char* energy = new char[columns * rows];
+	int* energy = new int[columns * rows];
 	int energy_value(0);
 	for (int p_row(0); p_row < rows; p_row++) {
 		for (int p_column(0); p_column < columns; p_column++) {
@@ -54,7 +55,7 @@ char* build_Energy_Array(int columns, int rows, char pgm_arr[])
 			cout << p_row + 1 << endl;
 			if (p_row + 1 < rows)
 				energy_value += abs(char2PosInt(pgm_arr[p_column + p_row * columns]) - char2PosInt(pgm_arr[p_column + (p_row + 1) * columns]));
-			cout << "energy_value: " << char2PosInt(energy_value) << endl;
+			cout << "energy_value: " << (energy_value) << endl;
 			cout << endl;
 
 			energy[p_column + p_row * columns] = energy_value;
@@ -62,7 +63,7 @@ char* build_Energy_Array(int columns, int rows, char pgm_arr[])
 		}
 	}
 	cout << "Energy Array Produced: \n";
-	printArray(columns, rows, energy);
+	print_Energy_Array(columns, rows, energy);
 	return energy;
 }
 
@@ -122,7 +123,19 @@ void printArray(int columns, int rows, char arr[])
 	cout << "Columns: " << columns << " and rows: " << rows << endl;
 	for (int r(0); r < rows; r++) {
 		for (int c(0); c < columns; c++) {
-				cout << char2PosInt(arr[columns * r + c]) << " "; // The current value is a 2's compliment.
+			cout << char2PosInt(arr[columns * r + c]) << " "; // The current value is a 2's compliment.
+		}
+		cout << endl;
+	}
+}
+
+/* Debug Function */
+void print_Energy_Array(int columns, int rows, int energy[])
+{
+	cout << "Columns: " << columns << " and rows: " << rows << endl;
+	for (int r(0); r < rows; r++) {
+		for (int c(0); c < columns; c++) {
+			cout << (energy[columns * r + c]) << " "; // The current value is a 2's compliment.
 		}
 		cout << endl;
 	}
@@ -192,7 +205,7 @@ int main(int argc, char *argv[])
 		int coll = 3;
 		printArray(coll, roww, testArray);
 		printRawArray(coll, roww, testArray);
-		char* nrg_Arr = build_Energy_Array(coll, roww, testArray);
+		int* nrg_Arr = build_Energy_Array(coll, roww, testArray);
 		// char* nrg_Arr = build_Energy_Array(columns, rows, pgm_Arr);
 
 		// Testing outputfile...
