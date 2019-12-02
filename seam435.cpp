@@ -47,13 +47,15 @@ void carve_VerSeam(int& columns, int& rows, char* pgm_arr, int* energy, int numS
 				cumulative_E[c + r * columns] = energy[c + r * columns];
 			else {
 				if (c - 1 < 0) // The index is on the far left column
-					cumulative_E[c + r * columns] = energy[c + r * columns] + min(energy[c + (r - 1) * columns], energy[c + 1 + (r - 1) * columns]);
+					cumulative_E[c + r * columns] = energy[c + r * columns] + min(cumulative_E[c + (r - 1) * columns], cumulative_E[c + 1 + (r - 1) * columns]);
 				else if (c + 1 == columns) // The index is o the far right column
-					cumulative_E[c + r * columns] = energy[c + r * columns] + min(energy[c - 1 + (r - 1) * columns], energy[c + (r - 1) * columns]);
+					cumulative_E[c + r * columns] = energy[c + r * columns] + min(cumulative_E[c - 1 + (r - 1) * columns], cumulative_E[c + (r - 1) * columns]);
 				else
-					cumulative_E[c + r * columns] = energy[c + r * columns] + min(min(energy[c - 1 + (r - 1) * columns], energy[c + (r -1) * columns]), energy[c + 1 + (r - 1) * columns]);
+					cumulative_E[c + r * columns] = energy[c + r * columns] + min(min(cumulative_E[c - 1 + (r - 1) * columns], cumulative_E[c + (r -1) * columns]), cumulative_E[c + 1 + (r - 1) * columns]);
 			}
+			cout << "cumulative_E: " << cumulative_E[c + r * columns] << endl;
 		}
+		cout << endl;
 	}
 
 	// Find min in last row, which will be starting seam point
