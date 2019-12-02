@@ -60,35 +60,35 @@ void carve_VerSeam(int& columns, int& rows, char* pgm_arr, int* energy, int numS
 
 	// Find min in last row, which will be starting seam point
 	int seamIndexList[rows];
-	int min_E_Index(-1); // Will be index where min value in current row is
+	int min_E_Index((rows - 1) * columns); // Will be index where min value in current row is
 	for (int c(0); c < columns; c++) {
-		if (energy[c + (rows - 1) * columns] < min_E_Index || min_E_Index == -1)
+		if (cumulative_E[c + (rows - 1) * columns] < cumulative_E[min_E_Index])
 			min_E_Index = c + (rows - 1) * columns;
 	}
-	seamIndexList[0] = energy[min_E_Index];
+	seamIndexList[0] = min_E_Index;
 
 	// Find the seam points that are adjacently above the currently obtained seam point.
 	int min_val, s(1);
-	for (int r(rows - 2); r > 0; r--) {
+	for (int r(rows - 2); r >= 0; r--) {
 		if (min_E_Index % columns == 0) { // The Previous Index is on the far left column
-			min_val = min(energy[min_E_Index - columns], energy[min_E_Index - columns + 1]);
-			if (energy[min_E_Index - columns] == min_val)
+			min_val = min(cumulative_E[min_E_Index - columns], cumulative_E[min_E_Index - columns + 1]);
+			if (cumulative_E[min_E_Index - columns] == min_val)
 				min_E_Index = min_E_Index - columns;
 			else
 				min_E_Index = min_E_Index - columns + 1;
 		}
 		else if ((min_E_Index + 1) % columns == 0) { // The Previous Index is on the far right column
-			min_val = min(energy[min_E_Index - columns], energy[min_E_Index - columns - 1]);
-			if (energy[min_E_Index - columns - 1] == min_val)
+			min_val = min(cumulative_E[min_E_Index - columns], cumulative_E[min_E_Index - columns - 1]);
+			if (cumulative_E[min_E_Index - columns - 1] == min_val)
 				min_E_Index = min_E_Index - columns - 1;
 			else
 				min_E_Index = min_E_Index - columns;
 		}
 		else {
-			min_val = min(min(energy[min_E_Index - columns - 1], energy[min_E_Index - columns]), energy[min_E_Index - columns + 1]);
-			if (energy[min_E_Index - columns - 1] == min_val)
+			min_val = min(min(cumulative_E[min_E_Index - columns - 1], cumulative_E[min_E_Index - columns]), cumulative_E[min_E_Index - columns + 1]);
+			if (cumulative_E[min_E_Index - columns - 1] == min_val)
 				min_E_Index = min_E_Index - columns - 1;
-			else if (energy[min_E_Index - columns] == min_val)
+			else if (cumulative_E[min_E_Index - columns] == min_val)
 				min_E_Index = min_E_Index - columns;
 			else
 				min_E_Index = min_E_Index - columns + 1;
@@ -98,8 +98,8 @@ void carve_VerSeam(int& columns, int& rows, char* pgm_arr, int* energy, int numS
 	}
 
 	cout << "List of seamPointsIndexes: ";
-	for (int c(0); c < columns; c++)
-		cout << seamIndexList[c] << " ";
+	for (int r(0); r < rows; r++)
+		cout << seamIndexList[r] << " ";
 	cout << endl;
 	// Remove the points from the pgm array using the seam points we found
 
