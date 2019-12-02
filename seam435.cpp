@@ -20,12 +20,13 @@ using std::getline;
 using std::min;
 using std::find;
 
+
 												/* use char* (&arrray)  to pass an array by reference */
 void carve_VerSeam(int& columns, int& rows, char* (&pgm_arr), int* energy);
 void carve_HorSeam(int& columns, int& rows, char* (&pgm_arr), int* energy);
 int* build_Energy_Array(int columns, int rows, char pgm_arr[]);
-void rotateArray90(int& columns, int& rows, char* pgm_arr, int* energy);
-void rotateArray270(int& columns, int& rows, char* pgm_arr, int* energy);
+void rotateArray90(int& columns, int& rows, char* (&pgm_arr), int* (&energy));
+void rotateArray270(int& columns, int& rows, char* (&pgm_arr), int* (&energy));
 void printRawArray(int columns, int rows, char arr[]);
 void printArray(int columns, int rows, char arr[]);
 void print_Energy_Array(int columns, int rows, int energy[]);
@@ -158,13 +159,13 @@ int* build_Energy_Array(int columns, int rows, char pgm_arr[])
 			energy_value = 0;
 		}
 	}
-	cout << "Energy Array Produced: \n";
-	print_Energy_Array(columns, rows, energy);
-	cout << endl;
+	//cout << "Energy Array Produced: \n";
+	//print_Energy_Array(columns, rows, energy);
+	//cout << endl;
 	return energy;
 }
 
-void rotateArray90(int& columns, int& rows, char* pgm_arr, int* energy)
+void rotateArray90(int& columns, int& rows, char* (&pgm_arr), int* (&energy))
 {
 	int rotated_c(0), rotated_r(0);
 	char* copy = new char[columns * rows];
@@ -197,7 +198,8 @@ void rotateArray90(int& columns, int& rows, char* pgm_arr, int* energy)
 	*/
 }
 
-void rotateArray270(int& columns, int& rows, char* pgm_arr, int* energy) {
+void rotateArray270(int& columns, int& rows, char* (&pgm_arr), int* (&energy))
+{
 	for (int i(0); i < 3; i++)
 		rotateArray90(columns, rows, pgm_arr, energy);
 	/*
@@ -259,9 +261,12 @@ int main(int argc, char *argv[])
 	if (argc < 4)
 		cout << "Error: Running program format must be: \"./seam435 imageFile.pgm #verticalSeams #horizontalSeams\"" << endl;
 
-	else {
+	else { 
 		string filename(argv[1]), strLiteral;
-		int verticalSeams(int(argv[2])), horizontalSeams(int(argv[3]));
+		//int verticalSeams(20), horizontalSeams(15);
+		int verticalSeams, horizontalSeams;
+		verticalSeams = strtol(argv[2], NULL, 10);
+		horizontalSeams = strtol(argv[3], NULL, 10);
 		int columns(0), rows(0), maxGreyVal(0);
 		ifstream inputFile;
 		ofstream outputFile;
@@ -306,20 +311,36 @@ int main(int argc, char *argv[])
 		printRawArray(columns, rows, pgm_Arr);
 		/////////////////////////////////////////////////////////////////////////////////////////////*/
 
-		// Testing outputfile...
-		outputFile.open("testingoutput.pgm");
+		/* Buidling Energy and Cumulitve Energy Matrices, and Seam Carving */
+		for (int v(0); v < verticalSeams; v++) {
+			cout << "Carving vertical seam out of matrix of columns " << columns << " and rows " << rows << endl;
+			int* nrg_Arr = build_Energy_Array(columns, rows, pgm_Arr);
+			carve_VerSeam(columns, rows, pgm_Arr, nrg_Arr);
+			delete nrg_Arr;
+		}
+		for (int h(0); h < horizontalSeams; h++) {
+			cout << "Carving horizontal seam out of matrix of columns " << columns << " and rows " << rows << endl;
+			int* nrg_Arr = build_Energy_Array(columns, rows, pgm_Arr);
+			carve_HorSeam(columns, rows, pgm_Arr, nrg_Arr);
+			delete nrg_Arr;
+		}
+
+		// Writing to outputfile...
+		cout << "\nWriting to output..." << endl;
+		outputFile.open(filename.substr(0, filename.size() - 4) + "_processed.pgm");
 		outputFile << "P2\n# Created by IrfanView\n" << columns << " " << rows << "\n" << maxGreyVal << "\n";
 		for (int r(0); r < rows; r++) {
 			for (int c(0); c < columns; c++) {
-				if (int(pgm_Arr[columns * r + c]) <= 0)
-					outputFile << 256 + int(pgm_Arr[columns * r + c]); // The current value is a 2's compliment.
-				else
-					outputFile << int(pgm_Arr[columns * r + c]);
+				outputFile << char2PosInt(pgm_Arr[c + r * columns]); // Check for 2's compliment
 				if (c != columns - 1)
 					outputFile << " ";
 			}
 			if (r != rows - 1)
-				outputFile << "\n";
+				outputFile << " \n";
 		}
+		outputFile << " \n";
+		outputFile.close();
+		delete pgm_Arr;
 	}
+	return 0;
 }
