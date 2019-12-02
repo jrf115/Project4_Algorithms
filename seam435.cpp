@@ -20,10 +20,9 @@ using std::getline;
 using std::min;
 using std::find;
 
-
 												/* use char* (&arrray)  to pass an array by reference */
-void carve_VerSeam(int& columns, int& rows, char* (&pgm_arr), int* energy);
-void carve_HorSeam(int& columns, int& rows, char* (&pgm_arr), int* energy);
+void carve_VerSeam(int& columns, int& rows, char* (&pgm_arr), int* (&energy));
+void carve_HorSeam(int& columns, int& rows, char* (&pgm_arr), int* (&energy));
 int* build_Energy_Array(int columns, int rows, char pgm_arr[]);
 void rotateArray90(int& columns, int& rows, char* (&pgm_arr), int* (&energy));
 void rotateArray270(int& columns, int& rows, char* (&pgm_arr), int* (&energy));
@@ -32,6 +31,7 @@ void printArray(int columns, int rows, char arr[]);
 void print_Energy_Array(int columns, int rows, int energy[]);
 int char2PosInt(char c);
 
+
 /***
 The cumulative minimum energy M for all possible connected vertical seams for each entry (i,j) can be calculated as the following:
 	M(i,j) =
@@ -39,7 +39,7 @@ The cumulative minimum energy M for all possible connected vertical seams for ea
 	Where:
 		e(i, j) = energy for a specific pixel
 */
-void carve_VerSeam(int& columns, int& rows, char* (&pgm_arr), int* energy)
+void carve_VerSeam(int& columns, int& rows, char* (&pgm_arr), int* (&energy))
 {
 	if (columns == 1 || columns == 0) {
 		cout << "Error: could not carve out seam: empty or minimum reached.";
@@ -124,7 +124,7 @@ void carve_VerSeam(int& columns, int& rows, char* (&pgm_arr), int* energy)
 	pgm_arr = carved_pgm_Arr;
 }
 
-void carve_HorSeam(int& columns, int& rows, char* (&pgm_arr), int* energy)
+void carve_HorSeam(int& columns, int& rows, char* (&pgm_arr), int* (&energy))
 {
 	rotateArray90(columns, rows, pgm_arr, energy);
 	carve_VerSeam(columns, rows, pgm_arr, energy);
@@ -318,15 +318,16 @@ int main(int argc, char *argv[])
 			carve_VerSeam(columns, rows, pgm_Arr, nrg_Arr);
 			delete nrg_Arr;
 		}
+		cout << endl;
 		for (int h(0); h < horizontalSeams; h++) {
 			cout << "Carving horizontal seam out of matrix of columns " << columns << " and rows " << rows << endl;
 			int* nrg_Arr = build_Energy_Array(columns, rows, pgm_Arr);
 			carve_HorSeam(columns, rows, pgm_Arr, nrg_Arr);
 			delete nrg_Arr;
 		}
-
+		cout << endl;
 		// Writing to outputfile...
-		cout << "\nWriting to output..." << endl;
+		cout << "\nWriting to output " << filename.substr(0, filename.size() - 4) + "_processed.pgm" << "..." << endl;
 		outputFile.open(filename.substr(0, filename.size() - 4) + "_processed.pgm");
 		outputFile << "P2\n# Created by IrfanView\n" << columns << " " << rows << "\n" << maxGreyVal << "\n";
 		for (int r(0); r < rows; r++) {
