@@ -21,8 +21,8 @@ using std::min;
 using std::find;
 
 												/* use char* (&arrray)  to pass an array by reference */
-void carve_VerSeam(int& columns, int& rows, char* (&pgm_arr), int* energy, int numSeams);
-void carve_HorSeam(int& columns, int& rows, char* (&pgm_arr), int* energy, int numSeams);
+void carve_VerSeam(int& columns, int& rows, char* (&pgm_arr), int* energy);
+void carve_HorSeam(int& columns, int& rows, char* (&pgm_arr), int* energy);
 int* build_Energy_Array(int columns, int rows, char pgm_arr[]);
 void rotateArray90(int& columns, int& rows, char* pgm_arr, int* energy);
 void rotateArray270(int& columns, int& rows, char* pgm_arr, int* energy);
@@ -38,7 +38,7 @@ The cumulative minimum energy M for all possible connected vertical seams for ea
 	Where:
 		e(i, j) = energy for a specific pixel
 */
-void carve_VerSeam(int& columns, int& rows, char* (&pgm_arr), int* energy, int numSeams)
+void carve_VerSeam(int& columns, int& rows, char* (&pgm_arr), int* energy)
 {
 	if (columns == 1 || columns == 0) {
 		cout << "Error: could not carve out seam: empty or minimum reached.";
@@ -123,10 +123,10 @@ void carve_VerSeam(int& columns, int& rows, char* (&pgm_arr), int* energy, int n
 	pgm_arr = carved_pgm_Arr;
 }
 
-void carve_HorSeam(int& columns, int& rows, char* (&pgm_arr), int* energy, int numSeams)
+void carve_HorSeam(int& columns, int& rows, char* (&pgm_arr), int* energy)
 {
 	rotateArray90(columns, rows, pgm_arr, energy);
-	carve_VerSeam(columns, rows, pgm_arr, energy, numSeams);
+	carve_VerSeam(columns, rows, pgm_arr, energy);
 	rotateArray270(columns, rows, pgm_arr, energy);
 }
 
@@ -305,21 +305,6 @@ int main(int argc, char *argv[])
 		cout << "RotatedArray" << endl;
 		printRawArray(columns, rows, pgm_Arr);
 		/////////////////////////////////////////////////////////////////////////////////////////////*/
-		char* testArray = new char[24]; testArray[0] = (30);	testArray[1] = (120);	testArray[2] = (196); testArray[3] = (215);	testArray[4] = (198); testArray[5] = (180); testArray[6] = (45);	testArray[7] = (4);	testArray[8] = (172); testArray[9] = (5); testArray[10] = (250);	testArray[11] = (252); testArray[12] = (190); testArray[13] = (192);	testArray[14] = (53); testArray[15] = (35); testArray[16] = (123); testArray[17] = (124); testArray[18] = (5); testArray[19] = (100); testArray[20] = (132); testArray[21] = (110);	testArray[22] = (114); testArray[23] = (203);
-		int roww = 8;
-		int coll = 3;
-		printArray(coll, roww, testArray);
-		printRawArray(coll, roww, testArray);
-		int* nrg_Arr = build_Energy_Array(coll, roww, testArray);
-		// char* nrg_Arr = build_Energy_Array(columns, rows, pgm_Arr);
-		carve_VerSeam(coll, roww, testArray, nrg_Arr, 2);
-		delete nrg_Arr;
-		cout << "makeing sure it is correct: " << endl;
-		printArray(coll, roww, testArray);
-		nrg_Arr = build_Energy_Array(coll, roww, testArray);
-		carve_HorSeam(coll, roww, testArray, nrg_Arr, 2);
-		cout << "makeing sure the horizontal carve is correct: " << endl;
-		printArray(coll, roww, testArray);
 
 		// Testing outputfile...
 		outputFile.open("testingoutput.pgm");

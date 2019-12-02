@@ -1,0 +1,15 @@
+char* testArray = new char[24]; testArray[0] = (30);	testArray[1] = (120);	testArray[2] = (196); testArray[3] = (215);	testArray[4] = (198); testArray[5] = (180); testArray[6] = (45);	testArray[7] = (4);	testArray[8] = (172); testArray[9] = (5); testArray[10] = (250);	testArray[11] = (252); testArray[12] = (190); testArray[13] = (192);	testArray[14] = (53); testArray[15] = (35); testArray[16] = (123); testArray[17] = (124); testArray[18] = (5); testArray[19] = (100); testArray[20] = (132); testArray[21] = (110);	testArray[22] = (114); testArray[23] = (203);
+int roww = 8;
+int coll = 3;
+printArray(coll, roww, testArray);
+printRawArray(coll, roww, testArray);
+int* nrg_Arr = build_Energy_Array(coll, roww, testArray);
+// char* nrg_Arr = build_Energy_Array(columns, rows, pgm_Arr);
+carve_VerSeam(coll, roww, testArray, nrg_Arr, 2);
+delete nrg_Arr;
+cout << "makeing sure it is correct: " << endl;
+printArray(coll, roww, testArray);
+nrg_Arr = build_Energy_Array(coll, roww, testArray);
+carve_HorSeam(coll, roww, testArray, nrg_Arr, 2);
+cout << "makeing sure the horizontal carve is correct: " << endl;
+printArray(coll, roww, testArray);
