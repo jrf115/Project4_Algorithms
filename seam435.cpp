@@ -291,7 +291,7 @@ int main(int argc, char *argv[])
 		printRawArray(coll, roww, testArray);
 		int* nrg_Arr = build_Energy_Array(coll, roww, testArray);
 		// char* nrg_Arr = build_Energy_Array(columns, rows, pgm_Arr);
-		carve_VerSeam(columns, rows, testArray, nrg_Arr, 2);
+		carve_VerSeam(coll, roww, testArray, nrg_Arr, 2);
 
 		// Testing outputfile...
 		outputFile.open("testingoutput.pgm");
