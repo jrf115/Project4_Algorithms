@@ -18,6 +18,7 @@ using std::ofstream;
 using std::string;
 using std::getline;
 using std::min;
+using std::find;
 
 
 void carve_VerSeam(int& columns, int& rows, char* pgm_arr, int* energy, int numSeams);
@@ -39,6 +40,10 @@ The cumulative minimum energy M for all possible connected vertical seams for ea
 */
 void carve_VerSeam(int& columns, int& rows, char* pgm_arr, int* energy, int numSeams)
 {
+	if (columns == 1 || columns == 0) {
+		cout << "Error: could not carve out seam: empty or minimum reached.";
+		return;
+	}
 	int* cumulative_E = new int[columns * rows];
 	// Build Cumulative Minimum Energy array
 	for (int r(0); r < rows; r++) {
@@ -53,9 +58,7 @@ void carve_VerSeam(int& columns, int& rows, char* pgm_arr, int* energy, int numS
 				else
 					cumulative_E[c + r * columns] = energy[c + r * columns] + min(min(cumulative_E[c - 1 + (r - 1) * columns], cumulative_E[c + (r -1) * columns]), cumulative_E[c + 1 + (r - 1) * columns]);
 			}
-			cout << "cumulative_E: " << cumulative_E[c + r * columns] << endl;
 		}
-		cout << endl;
 	}
 
 	// Find min in last row, which will be starting seam point
@@ -96,13 +99,26 @@ void carve_VerSeam(int& columns, int& rows, char* pgm_arr, int* energy, int numS
 		seamIndexList[s] = min_E_Index;
 		s++;
 	}
-
-	cout << "List of seamPointsIndexes: ";
-	for (int r(0); r < rows; r++)
-		cout << seamIndexList[r] << " ";
-	cout << endl;
-	// Remove the points from the pgm array using the seam points we found
-
+	
+	// Remove the points from the pgm array using the seam points we found.
+	char* carved_pgm_Arr = new char[(columns - 1) * rows];
+	int c(0);
+	for (int i(0); i < columns * rows; i++) {
+		bool add_bool = true;
+		for (int s(0); s < (rows); s++) {
+			if (seamIndexList[s] == i) {
+				add_bool = false;
+				break;
+			}
+		}
+		if (add_bool) {
+			carved_pgm_Arr[c] = pgm_arr[i];
+			c++;
+		}
+	}
+	columns -= 1;
+	cout << "Carved Array: " << endl;
+	printArray(columns, rows, carved_pgm_Arr);
 }
 
 void carve_HorSeam(int& columns, int& rows, char* pgm_arr, int* energy, int numSeams)
