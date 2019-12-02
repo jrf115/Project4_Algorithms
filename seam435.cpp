@@ -8,6 +8,7 @@
 #include <string>
 #include <fstream>
 #include <stdlib.h> /* abs */
+#include <algorithm> /* min */
 
 
 using std::cout;
@@ -16,29 +17,97 @@ using std::ifstream;
 using std::ofstream;
 using std::string;
 using std::getline;
+using std::min;
 
 
-void carve_VerSeam(int& columns, int& rows, char* pgm_arr, int* energy, int seams);
-void carve_HorSeam(int& columns, int& rows, char* pgm_arr, int* energy, int seams);
+void carve_VerSeam(int& columns, int& rows, char* pgm_arr, int* energy, int numSeams);
+void carve_HorSeam(int& columns, int& rows, char* pgm_arr, int* energy, int numSeams);
 int* build_Energy_Array(int columns, int rows, char pgm_arr[]);
-void rotateArray90(int& columns, int& rows, char* pgm_arr);
-void rotateArray270(int& columns, int& rows, char* pgm_arr);
+void rotateArray90(int& columns, int& rows, char* pgm_arr, int* energy);
+void rotateArray270(int& columns, int& rows, char* pgm_arr, int* energy);
 void printRawArray(int columns, int rows, char arr[]);
 void printArray(int columns, int rows, char arr[]);
 void print_Energy_Array(int columns, int rows, int energy[]);
 int char2PosInt(char c);
 
-
-void carve_VerSeam(int& columns, int& rows, char* pgm_arr, int* energy, int seams)
+/***
+The cumulative minimum energy M for all possible connected vertical seams for each entry (i,j) can be calculated as the following:
+	M(i,j) = 
+		e(i, j) + min(M(i - 1, j - 1), M(i, j - 1), M(i + 1, j - 1))
+	Where: 
+		e(i, j) = energy for a specific pixel
+*/
+void carve_VerSeam(int& columns, int& rows, char* pgm_arr, int* energy, int numSeams)
 {
+	int* cumulative_E = new int[columns * rows];
+	// Build Cumulative Minimum Energy array
+	for (int r(0); r < rows; r++) {
+		for (int c(0); c < columns; c++) {
+			if (r == 0) 
+				cumulative_E[c + r * columns] = energy[c + r * columns];
+			else {
+				if (c - 1 < 0) // The index is on the far left column
+					cumulative_E[c + r * columns] = energy[c + r * columns] + min(energy[c + (r - 1) * columns], energy[c + 1 + (r - 1) * columns]);
+				else if (c + 1 == columns) // The index is o the far right column
+					cumulative_E[c + r * columns] = energy[c + r * columns] + min(energy[c - 1 + (r - 1) * columns], energy[c + (r - 1) * columns]);
+				else
+					cumulative_E[c + r * columns] = energy[c + r * columns] + min(min(energy[c - 1 + (r - 1) * columns], energy[c + (r -1) * columns]), energy[c + 1 + (r - 1) * columns]);
+			}
+		}
+	}
+
+	// Find min in last row, which will be starting seam point
+	int seamIndexList[rows];
+	int min_E_Index(-1); // Will be index where min value in current row is
+	for (int c(0); c < columns; c++) {
+		if (energy[c + (rows - 1) * columns] < min_E_Index || min_E_Index == -1)
+			min_E_Index = c + (rows - 1) * columns;
+	}
+	seamIndexList[0] = energy[min_E_Index];
+
+	// Find the seam points that are adjacently above the currently obtained seam point.
+	int min_val, s(1);
+	for (int r(rows - 2); r > 0; r--) {
+		if (min_E_Index % columns == 0) { // The Previous Index is on the far left column
+			min_val = min(energy[min_E_Index - columns], energy[min_E_Index - columns + 1]);
+			if (energy[min_E_Index - columns] == min_val)
+				min_E_Index = min_E_Index - columns;
+			else
+				min_E_Index = min_E_Index - columns + 1;
+		}
+		else if ((min_E_Index + 1) % columns == 0) { // The Previous Index is on the far right column
+			min_val = min(energy[min_E_Index - columns], energy[min_E_Index - columns - 1]);
+			if (energy[min_E_Index - columns - 1] == min_val)
+				min_E_Index = min_E_Index - columns - 1;
+			else
+				min_E_Index = min_E_Index - columns;
+		}
+		else {
+			min_val = min(min(energy[min_E_Index - columns - 1], energy[min_E_Index - columns]), energy[min_E_Index - columns + 1]);
+			if (energy[min_E_Index - columns - 1] == min_val)
+				min_E_Index = min_E_Index - columns - 1;
+			else if (energy[min_E_Index - columns] == min_val)
+				min_E_Index = min_E_Index - columns;
+			else
+				min_E_Index = min_E_Index - columns + 1;
+		}
+		seamIndexList[s] = min_E_Index;
+		s++;
+	}
+
+	cout << "List of seamPointsIndexes: ";
+	for (int c(0); c < columns; c++)
+		cout << seamIndexList[c] << " ";
+	cout << endl;
+	// Remove the points from the pgm array using the seam points we found
 
 }
 
-void carve_HorSeam(int& columns, int& rows, char* pgm_arr, int* energy, int seams)
+void carve_HorSeam(int& columns, int& rows, char* pgm_arr, int* energy, int numSeams)
 {
-	rotateArray90(columns, rows, pgm_arr);
-	carve_VerSeam(columns, rows, pgm_arr, energy, seams);
-	rotateArray270(columns, rows, pgm_arr);
+	rotateArray90(columns, rows, pgm_arr, energy);
+	carve_VerSeam(columns, rows, pgm_arr, energy, numSeams);
+	rotateArray270(columns, rows, pgm_arr, energy);
 }
 
 /***
@@ -75,17 +144,21 @@ int* build_Energy_Array(int columns, int rows, char pgm_arr[])
 	return energy;
 }
 
-void rotateArray90(int& columns, int& rows, char* pgm_arr)
+void rotateArray90(int& columns, int& rows, char* pgm_arr, int* energy)
 {
 	int rotated_c(0), rotated_r(0);
 	char* copy = new char[columns * rows];
-	for (int i(0); i < columns * rows; i++)
+	int* nrg_copy = new int[columns * rows];
+	for (int i(0); i < columns * rows; i++) {
 		copy[i] = pgm_arr[i];
-
+		nrg_copy[i] = energy[i];
+	}
+		
 	for (int c(0); c < columns; c++) {
 		for (int r(rows - 1); r >= 0; r--) {
 			pgm_arr[rotated_c + rotated_r * rows] = copy[c + r * columns];
 			//cout << "copied " << c << " + " << r << " * " << columns << " == " << c + r * columns << " _____TO_____ " << rotated_c << " + " << rotated_r << " * " << rows << " == " << rotated_c + rotated_r * rows << endl;
+			energy[rotated_c + rotated_r * rows] = nrg_copy[c + r * columns];
 			rotated_c++;
 		}
 		rotated_r++;
@@ -94,6 +167,7 @@ void rotateArray90(int& columns, int& rows, char* pgm_arr)
 
 	// Delete old array and switch columns/rows
 	delete copy;
+	delete energy;
 	int temp(columns);
 	columns = rows;
 	rows = temp;
@@ -103,12 +177,13 @@ void rotateArray90(int& columns, int& rows, char* pgm_arr)
 	*/
 }
 
-void rotateArray270(int& columns, int& rows, char* pgm_arr) {
+void rotateArray270(int& columns, int& rows, char* pgm_arr, int* energy) {
 	for (int i(0); i < 3; i++)
-		rotateArray90(columns, rows, pgm_arr);
+		rotateArray90(columns, rows, pgm_arr, energy);
 	/*
 	cout << "pgm_arr 270_rotated to: " << endl;
 	printRawArray(columns, rows, pgm_arr);
+	print_Energy_Array(columns, rows, energy);
 	cout << endl;
 	*/
 }
@@ -216,6 +291,7 @@ int main(int argc, char *argv[])
 		printRawArray(coll, roww, testArray);
 		int* nrg_Arr = build_Energy_Array(coll, roww, testArray);
 		// char* nrg_Arr = build_Energy_Array(columns, rows, pgm_Arr);
+		carve_VerSeam(columns, rows, testArray, nrg_Arr, 2);
 
 		// Testing outputfile...
 		outputFile.open("testingoutput.pgm");
