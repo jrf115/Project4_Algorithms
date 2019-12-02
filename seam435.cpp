@@ -118,8 +118,8 @@ void carve_VerSeam(int& columns, int& rows, char* (&pgm_arr), int* energy)
 		}
 	}
 	columns += -1;
-	cout << "Carved Array: " << endl;
-	printArray(columns, rows, carved_pgm_Arr);
+	//cout << "Carved Array: " << endl;
+	//printArray(columns, rows, carved_pgm_Arr);
 	delete pgm_arr;
 	pgm_arr = carved_pgm_Arr;
 }

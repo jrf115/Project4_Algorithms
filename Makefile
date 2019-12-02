@@ -11,3 +11,4 @@ seam: seam435.cpp
 
 clean:
 	rm -rf seam435
+	rm -rf *_processed.pgm
