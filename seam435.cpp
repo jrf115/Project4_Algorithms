@@ -46,7 +46,7 @@ void carve_VerSeam(int& columns, int& rows, char* pgm_arr, int* energy, int numS
 			if (r == 0) 
 				cumulative_E[c + r * columns] = energy[c + r * columns];
 			else {
-				if (c - 1 < 0) // The index is on the far left column
+				if (c - 1 == -1) // The index is on the far left column
 					cumulative_E[c + r * columns] = energy[c + r * columns] + min(cumulative_E[c + (r - 1) * columns], cumulative_E[c + 1 + (r - 1) * columns]);
 				else if (c + 1 == columns) // The index is o the far right column
 					cumulative_E[c + r * columns] = energy[c + r * columns] + min(cumulative_E[c - 1 + (r - 1) * columns], cumulative_E[c + (r - 1) * columns]);
