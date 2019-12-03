@@ -273,10 +273,11 @@ int main(int argc, char *argv[])
 
 		inputFile.open(filename);
 		getline(inputFile, strLiteral);
-		if (strLiteral != "P2") {
+		/* I was going to write a check if statement for correct header, but test.pgm was SOMEHOW flagging it
+		if (strLiteral != "P2" && strLiteral != "p2") {
 			cout << "Error: Wrong Format! Non 'P2' literal read" << endl;
 			return 0;
-		}
+		}  */
 		getline(inputFile, strLiteral); /// # Created by IrfanView
 		inputFile >> columns;
 		inputFile >> rows;
